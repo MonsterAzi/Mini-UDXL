@@ -1,40 +1,8 @@
 import timeit
 import matplotlib.pyplot as plt
+import MPN
 
-# Predict with weights for MPN
-def predict_mpn(row, weights_mpn):
-    activation = weights_mpn[0]
-    for i in range(len(row)-1):
-        activation += weights_mpn[i + 1] * row[i]
-    return activation
-
-# Estimate MPN weights using stochastic gradient descent
-def train_weights_mpn(train, l_rate, n_epoch):
-    global weights_mpn
-    global training_data
-    global error_data
-    weights_mpn = [0.0 for i in range(len(train[0]))]
-    error_data = []
-    training_data = []
-    for epoch in range(n_epoch):
-        sum_error = 0.0
-        training_data_subset = []
-        for row in train:
-            prediction = predict_mpn(row, weights_mpn)
-            training_data_subset.append([row[0],row[1],prediction])
-            error = row[-1] - prediction
-            sum_error += error**2
-            weights_mpn[0] = weights_mpn[0] + l_rate * error
-            for i in range(len(row)-1):
-                weights_mpn[i + 1] = weights_mpn[i + 1] + l_rate * error * row[i]
-        training_data.append(training_data_subset)
-        error_data.append([epoch, sum_error])
-        print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
-
-# test MPN
-def test_mpn():
-    global dataset
-    dataset = [[2.7810836,2.550537003,0],
+dataset = [[2.7810836,2.550537003,0],
     [1.465489372,2.362125076,0],
     [3.396561688,4.400293529,0],
     [1.38807019,1.850220317,0],
@@ -44,19 +12,16 @@ def test_mpn():
     [6.922596716,1.77106367,1],
     [8.675418651,-0.242068655,1],
     [7.673756466,3.508563011,1]]
-    l = 500
-    l_rate = 1 / l
-    n_epoch = 40
-    weights_mpn = train_weights_mpn(dataset, l_rate, n_epoch)
-    return weights_mpn
+l = 500
+n_epoch = 40
 
-time = timeit.timeit("test_mpn()", globals=locals(), number=1)*1000
-parameters = len(weights_mpn)
-error_x = [row[0] for row in error_data]
-error_y = [row[1] for row in error_data]
+time_mpn = timeit.timeit("MPN.test_mpn(dataset, l, n_epoch)", globals=locals(), number=1)*1000
+parameters_mpn = len(MPN.weights_mpn)
+error_x = [row[0] for row in MPN.error_data]
+error_y = [row[1] for row in MPN.error_data]
 dataset_x = [dataset.index(row) for row in dataset]
 dataset_y = [row[-1] for row in dataset]
-training_y = [row[-1] for row in training_data[-1]]
+training_y = [row[-1] for row in MPN.training_data[-1]]
 
 plt.style.use("seaborn-v0_8-bright")
 fig, (ax1, ax2) = plt.subplots(nrows=2)
@@ -72,5 +37,5 @@ ax2.plot(dataset_x, dataset_y, label="Dataset", color="#FF0000", marker="s")
 ax2.plot(dataset_x, training_y, label="Training Data", color="#00FF00", marker="o")
 ax2.set_title("Dataset vs Training Data")
 
-print("Parameters: %d, Time: %f ms, Ppms: %f" % (parameters, time, parameters/time))
+print("MPN: parameters: %d, time: %f ms, ppms: %f" % (parameters_mpn, time_mpn, parameters_mpn/time_mpn))
 plt.show()
