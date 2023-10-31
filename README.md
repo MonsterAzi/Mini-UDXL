@@ -1,2 +1,2 @@
-# Mini-UDXL
-My Project for Semantic Synthesis
+# Perceptron
+Literally just a basic perceptron in Python
