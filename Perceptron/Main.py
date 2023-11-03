@@ -15,7 +15,7 @@ dataset = [[2.7810836,2.550537003,0],
 l = 500
 n_epoch = 40
 
-time_mpn = timeit.timeit("MPN.test_mpn(dataset, l, n_epoch)", globals=locals(), number=1)*1000
+time_mpn = timeit.timeit("MPN.test_mpn(dataset, l, n_epoch)", globals=locals(), number=1000)
 parameters_mpn = len(MPN.weights_mpn)
 error_x = [row[0] for row in MPN.error_data]
 error_y = [row[1] for row in MPN.error_data]
